@@ -23,7 +23,7 @@ TEST(CtString, Constructor) {
   { constexpr auto cts = L"foo"_cts; }
   {
     constexpr const char foo[] = "foo";
-    constexpr ct_string cts23{foo};
+    constexpr ct_string cts{foo};
   }
 }
 

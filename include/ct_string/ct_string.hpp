@@ -15,6 +15,15 @@ namespace ct_string {
 
 namespace detail {
 struct ct_string_base {};
+struct ct_string_holder_base {};
+
+template <typename T>
+constexpr bool is_ct_string_holder =
+    std::is_base_of_v<detail::ct_string_holder_base, T>;
+
+template <typename T>
+concept ct_string_holder_type = is_ct_string_holder<T>;
+
 } // namespace detail
 
 template <typename T>
@@ -28,7 +37,8 @@ concept DifferentTypeString =
     !std::is_same_v<Current, T> && !std::is_base_of_v<T, Current>;
 
 // N does not count null-terminator
-template <typename Char, std::size_t N> struct basic_string_holder {
+template <typename Char, std::size_t N>
+struct basic_string_holder : detail::ct_string_holder_base {
 
   using view_t = std::basic_string_view<Char>;
   using string_t = std::basic_string<Char>;
@@ -68,7 +78,8 @@ template <typename Char, std::size_t N> struct basic_string_holder {
 template <typename Char, std::size_t N>
 basic_string_holder(const Char (&)[N]) -> basic_string_holder<Char, N - 1>;
 
-template <auto StringHolder> struct basic_ct_string2 : detail::ct_string_base {
+template <detail::ct_string_holder_type auto StringHolder>
+struct basic_ct_string2 : detail::ct_string_base {
 
   using string_holder_t = decltype(StringHolder);
   using char_t = typename string_holder_t::char_t;
@@ -285,21 +296,19 @@ using ct_string_acceptor = detail::oversized_ct_string<Char>;
 
 namespace literals {
 template <detail::oversized_ct_string<char> StringHolder>
-consteval auto operator""_cts() {
+consteval auto operator""_cts2() {
   return basic_ct_string<char, StringHolder.m_length>{StringHolder.m_str};
 }
 
 template <detail::oversized_ct_string<wchar_t> StringHolder>
-consteval auto operator""_cts() {
+consteval auto operator""_cts2() {
   return basic_ct_string<wchar_t, StringHolder.m_length>{StringHolder.m_str};
 }
 
-template <basic_string_holder OversizedString>
-consteval auto operator""_cts2() {
-  // constexpr basic_string_holder<char, OversizedString.m_length> str{
-  //     OversizedString.m_str};
+template <basic_string_holder OversizedString> consteval auto operator""_cts() {
   return basic_ct_string2<OversizedString>{};
 }
+
 } // namespace literals
 
 } // namespace ct_string
