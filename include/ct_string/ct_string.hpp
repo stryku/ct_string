@@ -40,6 +40,11 @@ template <typename Char, std::size_t N> struct basic_string_holder {
     m_chars[N] = Char{'\0'};
   }
 
+  constexpr basic_string_holder(const Char (&str)[N + 1]) {
+    std::copy_n(str, N, &m_chars[0]);
+    m_chars[N] = Char{'\0'};
+  }
+
   template <std::size_t U>
   constexpr auto operator+(const basic_string_holder<char_t, U> &other) const {
     std::array<char_t, N + U> chars{};
@@ -59,6 +64,9 @@ template <typename Char, std::size_t N> struct basic_string_holder {
 
   Char m_chars[N + 1]{};
 };
+
+template <typename Char, std::size_t N>
+basic_string_holder(const Char (&)[N]) -> basic_string_holder<Char, N - 1>;
 
 template <auto StringHolder> struct basic_ct_string2 : detail::ct_string_base {
 
@@ -286,11 +294,11 @@ consteval auto operator""_cts() {
   return basic_ct_string<wchar_t, StringHolder.m_length>{StringHolder.m_str};
 }
 
-template <detail::oversized_ct_string<char> OversizedString>
+template <basic_string_holder OversizedString>
 consteval auto operator""_cts2() {
-  constexpr basic_string_holder<char, OversizedString.m_length> str{
-      OversizedString.m_str};
-  return basic_ct_string2<str>{};
+  // constexpr basic_string_holder<char, OversizedString.m_length> str{
+  //     OversizedString.m_str};
+  return basic_ct_string2<OversizedString>{};
 }
 } // namespace literals
 
