@@ -1,6 +1,5 @@
 enable_testing()
 
-
 include(FetchContent)
 
 FetchContent_Declare(
@@ -11,8 +10,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(googletest)
 
-include(GoogleTest)
-
 add_executable(ct_string_tests ct_string_tests.cpp)
 
 target_link_libraries(ct_string_tests
@@ -21,4 +18,5 @@ target_link_libraries(ct_string_tests
     gtest_main
 )
 
+include(GoogleTest)
 gtest_discover_tests(ct_string_tests)
