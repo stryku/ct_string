@@ -1,14 +1,17 @@
 #include <ct_string/ct_string.hpp>
 
 #include <gtest/gtest.h>
+
 #include <ostream>
 
 namespace ct_string {
-// template <typename Char, std::size_t N>
-// std::ostream &operator<<(std::ostream &out,
-//                          const basic_ct_string<Char, N> &str) {
-//   return out << str.str_view();
-// }
+
+template <detail::ct_string_holder_type auto StringHolder>
+std::ostream &operator<<(std::ostream &out,
+                         const basic_ct_string<StringHolder> &str) {
+  return out << std::quoted(str.str_view());
+}
+
 } // namespace ct_string
 
 namespace ct_string::tests {
@@ -55,6 +58,10 @@ TEST(CtString, Comparison) {
   EXPECT_NE("long baz"s, foo);
   static_assert(foo != long_baz);
   static_assert(long_baz != foo);
+}
+
+TEST(CtString, OperatorPlus) {
+  static_assert("foo"_cts + " "_cts + "bar"_cts == "foo bar");
 }
 
 } // namespace ct_string::tests
