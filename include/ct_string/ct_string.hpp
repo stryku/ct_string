@@ -152,6 +152,17 @@ struct basic_ct_string : detail::ct_string_base {
   constexpr const char_t *c_str() const {
     return str_view().data();
   }
+
+  template <ct_string_type T0,
+            ct_string_type... Ts>
+  constexpr auto join(const T0 &arg0, const Ts &...args) const {
+    return (arg0 + ... + (*this + args));
+  }
+
+  constexpr auto join() const {
+    constexpr basic_string_holder bsh{""};
+    return basic_ct_string<bsh>{};
+  }
 };
 
 namespace literals {

@@ -64,4 +64,9 @@ TEST(CtString, OperatorPlus) {
   static_assert("foo"_cts + " "_cts + "bar"_cts == "foo bar");
 }
 
+TEST(CtString, Join) {
+  static_assert((", "_cts).join("foo"_cts, "bar"_cts) == "foo, bar");
+  static_assert((""_cts).join("foo"_cts, "bar"_cts) == "foobar");
+}
+
 } // namespace ct_string::tests
